@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% if error %}
+        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+
+    <div class="d-flex align-items-center justify-content-center" style="margin-top: 80px">
+        <a class="navbar-brand mt-2 mt-lg-0" href="#">
+            <img
+                    src="http://127.0.0.1:8000/resources/logo.png"
+                    height="70"
+                    alt="MDB Logo"
+                    loading="lazy"
+            />
+        </a>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center" style="margin-top: 20px; margin-bottom: 30px">
+        <h1>Войти в "Гид по ремонту"</h1>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center">
+        <form action="{{ path('login') }}" method="post" class="form-center shadow-3-strong" style="width: 400px; height: 190px">
+            <div class="form-outline border rounded-8" style="margin-top: 20px; margin-left: 10px; margin-right: 10px">
+                <input class="form-control" type="text" id="username" name="_username" >
+                <label for="username" class="form-label">Электронная почта</label>
+            </div>
+
+            <div class="form-outline border rounded-8" style="margin-top: 20px; margin-left: 10px; margin-right: 10px">
+                <input class="form-control" type="password" id="password" name="_password">
+                <label for="password" class="form-label">Пароль</label>
+            </div>
+
+
+            {# If you want to control the URL the user is redirected to on success
+        <input type="hidden" name="_target_path" value="/account"/> #}
+
+            <button type="submit" class="btn btn-light btn-rounded" style="margin-top: 20px;">Войти</button>
+        </form>
+    </div>
+    <div class="d-flex align-items-center justify-content-center" style="margin-top: 20px">
+        <span>Впервые на нашем сайте? <a href="{{ path('register') }}">Зарегистрируйтесь!</a></span>
+    </div>
+{% endblock %}

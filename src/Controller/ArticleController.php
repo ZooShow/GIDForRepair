@@ -100,7 +100,7 @@ class ArticleController extends AbstractController
      * @param $id
      * @return void
      *
-     * @Route ("/{id}", name="_show")
+     * @Route ("/{id}", name="show")
      */
     public function showArticle($id): Response
     {
