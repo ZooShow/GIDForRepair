@@ -18,3 +18,7 @@
     text-align: center;
     /*margin-top: 100px;*/
 }
+
+input:invalid {
+    border: 1px solid red;
+}

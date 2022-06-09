@@ -8,7 +8,6 @@ import Marker from "@editorjs/marker";
 import Delimiter from "@editorjs/delimiter";
 import Table from "@editorjs/table";
 import SimpleVideo from 'simple-video-editorjs';
-import edjsHTML from "editorjs-html";
 
 (() => {
     let a = document.getElementById('btnSaves');
@@ -152,11 +151,10 @@ import edjsHTML from "editorjs-html";
                     console.log("Server response: ", xhr.statusText);
                 }
             };
-            let data = {
-                data: edjsParser.parse(outputData)
-            }
-            console.log(JSON.stringify(data))
-            xhr.send(JSON.stringify(data))
+
+            console.log(outputData);
+            console.log(JSON.stringify(outputData))
+            xhr.send(JSON.stringify(outputData))
         }).catch((error) => {
             console.log('Saving failed: ', error)
         });

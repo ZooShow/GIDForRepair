@@ -5,8 +5,11 @@ namespace App\Controller;
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
 use App\Repository\UserRepository;
+use App\Service\ArticleService;
 use App\Service\ResponseService;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,22 +25,26 @@ class ArticleController extends AbstractController
 
     private UserRepository $userRepository;
 
+    private ArticleService $articleService;
+
     public function __construct(
         ResponseService $responseService,
         ArticleRepository $articleRepository,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        ArticleService $articleService
     ) {
         $this->responseService = $responseService;
         $this->articleRepository = $articleRepository;
         $this->userRepository = $userRepository;
+        $this->articleService = $articleService;
     }
 
     /**
      * @Route(name="create")
      */
-    public function index(): Response
+    public function createArticle(): Response
     {
-        return $this->render('article/index.html.twig', [
+        return $this->render('article/create.html.twig', [
             'controller_name' => 'Article',
         ]);
     }
@@ -47,24 +54,36 @@ class ArticleController extends AbstractController
      * @return void
      * @Route("/save", name="save")
      */
-    public function saveArticle(Request $request)
+    public function saveArticle(Request $request): JsonResponse
     {
-        $user = $this->getUser();
-        $data = $request = $request->getContent();
-        $dataSerialize = json_decode($data);
-        $tmp = '';
-        foreach ($dataSerialize->data as $item) {
-            $tmp .= $item . '<br>';
+        try {
+            $userRequest = $this->getUser();
+
+            $data = $request->getContent();
+            $dataSerialize = json_decode($data);
+            $tmp = $this->articleService->parseArticle($dataSerialize);
+
+            $user = $this->userRepository->findOneBy(['email' => $userRequest->getUserIdentifier()]);
+
+            $article = new Article();
+            $article->setText($tmp);
+            $article->setAuthor($user);
+            $this->articleRepository->save($article);
+
+            $data = [
+                "success" => true,
+                "errors" => "При сохранении статьи что-то пошло не так"
+            ];
+
+            return $this->responseService->response($data);
+        } catch (Exception $e) {
+            $data = [
+                "success" => false,
+                "errors" => "При сохранении статьи что-то пошло не так"
+            ];
+
+            return $this->responseService->response($data, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-
-        $user_identifer = 'asdad@mail.ru';
-//        $author = $this->userRepository->findBy(['email' => $user->getUserIdentifier()]);
-        $author = $this->userRepository->findOneBy(['email' => $user_identifer]);
-        $article = new Article();
-        $article->setText($tmp);
-        $article->setAuthor($author);
-
-        $this->articleRepository->save($article);
     }
 
     /**
@@ -73,7 +92,7 @@ class ArticleController extends AbstractController
      *
      * @Route("/upload_file", name="save_file")
      */
-    public function uploadImageFromArticle(Request $request)
+    public function uploadImageFromArticle(Request $request): JsonResponse
     {
         try {
             $fileRequest = $request->files->get('image');
