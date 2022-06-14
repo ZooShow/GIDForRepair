@@ -3,16 +3,73 @@
 {% block title %}Создание статьи{% endblock %}
 
 {% block body %}
+    {#    <div class="modal fade" id="myModal" role="dialog"> #}
+    {#        <div class="modal-dialog"> #}
+
+    {#            <!-- Modal content--> #}
+    {#            <div class="modal-content"> #}
+    {#                <div class="modal-header"> #}
+    {#                    <button type="button" class="close" data-dismiss="modal">&times;</button> #}
+    {#                    <h4 class="modal-title">Modal Header</h4> #}
+    {#                </div> #}
+    {#                <div class="modal-body"> #}
+    {#                    <p>Some text in the modal.</p> #}
+    {#                </div> #}
+    {#                <div class="modal-footer"> #}
+    {#                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> #}
+    {#                </div> #}
+    {#            </div> #}
+
+    {#        </div> #}
+    {#    </div> #}
+
+
+    <div class="materialsArray" data-materials-array="{{ materials|json_encode|e('html_attr') }}"></div>
+    <div class="toolsArray" data-tools-array="{{ tools|json_encode|e('html_attr') }}"></div>
     <div id="app" class="container mt-5 shadow-5-strong ">
         <div class="card-header">Поделись с другими пользователями своими знаниями и умениями!</div>
         <div class="card-body over-hidden">
             <div id="editorJS" class="p-3" style="background: white"></div>
         </div>
+
+        <div class="card-footer text-right">
+            <p>Перед сохранением выбери тип ремонта и вид работ</p>
+            <div class="form-outline">
+                <select class="form-select select-input placeholder-active active" name="repairKind" id="repairKind">
+                    <option value="Косметический ремонт" selected>Косметический ремонт</option>
+                    <option value="Капитальный ремонт">Капитальный ремонт</option>
+                    <option value="Евроремонт">Евроремонт</option>
+                </select>
+                <select class="form-select select-input placeholder-active active" name="repairType" id="repairType">
+                </select>
+            </div>
+        </div>
+
+        <div class="card-footer text-right">
+            <select id="materials" class="form-select" data-mdb-placeholder="Выберите материалы" multiple>
+            </select>
+            <button id="btnAddMaterials" class="btn btn-light btn-rounded">
+                Добавить материалы
+            </button>
+            <p id="materialsP" class="hidden">Материалы:</p>
+        </div>
+
+        <div class="card-footer text-right">
+            <select id="tools" class="form-select" size="3" data-mdb-placeholder="Выберите материалы" multiple>
+            </select>
+            <button id="btnAddTools" class="btn btn-light btn-rounded">
+                Добавить инструменты
+            </button>
+            <p id="toolsP" class="hidden">Инструменты:</p>
+        </div>
+
         <div class="card-footer text-right">
             <button id="btnSaves" class="btn btn-light btn-rounded">
                 Сохранить
             </button>
-            <button id="btnReset" class="btn btn-light btn-rounded">Очистить</button>
+            <button id="btnReset" class="btn btn-light btn-rounded">
+                Очистить
+            </button>
         </div>
     </div>
 {% endblock %}

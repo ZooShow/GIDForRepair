@@ -3,6 +3,52 @@
 {% block body %}
     <div class="shadow-2-strong"
          style="width: 70vw; margin-top: 20px; margin-left: 15vw; padding-top:20px; padding-left: 20px; padding-right: 20px">
-        {{ text|raw }}
+        <span>Автор: {{ article.author }}</span>
+
+        {{ article.article|raw }}
+        <p>Не знаете какие средства необходимы для ремонта? Наш умный <a href="/calculator/{{ article.id }}" target="_blank">калькулятор</a> вам поможет!</p>
+        <h3>Необходимые инструменты</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for tool in article.tools %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{{ tool.src|raw }}" class="card-img-top" alt="Skyscrapers"/>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ tool.name }}</h5>
+                            <p class="card-text">
+                                {{ tool.description }}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/tool/{{ tool.id }}" class="btn btn-primary" target="_blank">Посмотреть у
+                                поставщиков</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h3 style="margin-top: 10px">Необходимые материалы</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for material in article.materials %}
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="{{ material.src|raw }}" class="card-img-top" alt="Skyscrapers"/>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ material.name }}</h5>
+                            <p class="card-text">
+                                {{ material.description }}
+                            </p>
+                            <h6 class="card-subtitle mb-2 text-muted">Количество: {{ material.count }}</h6>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/material/{{ material.id }}" class="btn btn-primary" target="_blank">Посмотреть
+                                у
+                                поставщиков</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

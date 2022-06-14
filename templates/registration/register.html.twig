@@ -3,9 +3,7 @@
 {% block title %}Регистрация{% endblock %}
 
 {% block body %}
-    {% if message %}
     <div>
-        {{ message }}
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -13,7 +11,7 @@
                         <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
                         <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">{{ message }}</div>
+                    <div class="modal-body"></div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-mdb-dismiss="modal">Close</button>
                         <button type="button" class="btn btn-primary">Save changes</button>
@@ -22,7 +20,6 @@
             </div>
         </div>
     </div>
-    {% endif %}
 
     <div class="d-flex align-items-center justify-content-center" style="margin-top: 30px">
         <a class="navbar-brand mt-2 mt-lg-0" href="#">

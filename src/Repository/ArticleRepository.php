@@ -45,10 +45,11 @@ class ArticleRepository extends ServiceEntityRepository
         }
     }
 
-    public function save(Article $article)
+    public function save(Article $article): int
     {
         $this->em->persist($article);
         $this->em->flush();
+        return $article->getId();
     }
 
 //    /**

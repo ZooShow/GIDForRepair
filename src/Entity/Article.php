@@ -28,6 +28,18 @@ class Article
      */
     private $text;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=RepairType::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $repairType;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=RepairKind::class)
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $repairKind;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -53,6 +65,30 @@ class Article
     public function setText(string $text): self
     {
         $this->text = $text;
+
+        return $this;
+    }
+
+    public function getRepairType(): ?RepairType
+    {
+        return $this->repairType;
+    }
+
+    public function setRepairType(?RepairType $repairType): self
+    {
+        $this->repairType = $repairType;
+
+        return $this;
+    }
+
+    public function getRepairKind(): ?RepairKind
+    {
+        return $this->repairKind;
+    }
+
+    public function setRepairKind(?RepairKind $repairKind): self
+    {
+        $this->repairKind = $repairKind;
 
         return $this;
     }

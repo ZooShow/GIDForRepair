@@ -1,14 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CalculatorController!{% endblock %}
+{% block title %}Калькулятор{% endblock %}
 
 {% block body %}
-    <div>
-        <canvas id="canvas" width="500" height="500" style="border: 1px solid black"></canvas>
-        <br>
-        <button id="btn">EnablePen</button>
-        <button id="save">SavePen</button>
+    <div id="dataId" data-id="{{ id }}"></div>
+    <div id="body" class="shadow-2-strong"
+         style="width: 70vw; margin-top: 20px; margin-left: 15vw; padding: 10px 20px 20px 20px;">
+        <p>Если у вашей стенки или пола нестандартная форма, вы легко сможете рассчитать ее площадь благодаря графическому калькулятору!</p>
+        <div class="d-flex align-items-center justify-content-center" style="margin-top: 20px; margin-bottom: 30px">
+            <canvas id="canvas" width="500" height="500" style="border: 1px solid black"></canvas>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-center" style="margin-top: 20px; margin-bottom: 30px">
+            <button id="save" class="btn btn-light btn-rounded">Рассчитать</button>
+        </div>
+
+        <div id="answer" class="d-flex align-items-center justify-content-center" style="margin-top: 20px; margin-bottom: 30px">
+            <span class="answer hidden">Площадь: 10м, периметр 12м</span>
+        </div>
+
     </div>
     <div class="follow-cursor hidden"></div>
-    <span class="answer hidden"></span>
 {% endblock %}

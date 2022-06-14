@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Гид по ремонту{% endblock %}
+
+{% block body %}
+    <!-- Carousel wrapper -->
+    <div id="carouselBasicExample" class="carousel slide carousel-fade" data-mdb-ride="carousel">
+        <!-- Indicators -->
+        <div class="carousel-indicators">
+            <button
+                    type="button"
+                    data-mdb-target="#carouselBasicExample"
+                    data-mdb-slide-to="0"
+                    class="active"
+                    aria-current="true"
+                    aria-label="Slide 1"
+            ></button>
+            <button
+                    type="button"
+                    data-mdb-target="#carouselBasicExample"
+                    data-mdb-slide-to="1"
+                    aria-label="Slide 2"
+            ></button>
+            <button
+                    type="button"
+                    data-mdb-target="#carouselBasicExample"
+                    data-mdb-slide-to="2"
+                    aria-label="Slide 3"
+            ></button>
+        </div>
+
+        <!-- Inner -->
+        <div class="carousel-inner">
+            <!-- Single item -->
+            <div class="carousel-item active">
+                {{ carousel[0].img | raw }}
+                <div class="carousel-caption d-none d-md-block">
+                    {{ carousel[0].header | raw }}
+                    {{ carousel[0].paragraph | raw }}
+                </div>
+            </div>
+
+            <!-- Single item -->
+            <div class="carousel-item">
+                <div class="carousel-item active">
+                    {{ carousel[1].img | raw }}
+                    <div class="carousel-caption d-none d-md-block">
+                        {{ carousel[1].header | raw }}
+                        {{ carousel[1].paragraph | raw }}
+                    </div>
+            </div>
+
+            <!-- Single item -->
+            <div class="carousel-item">
+                <div class="carousel-item active">
+                    {{ carousel[2].img | raw }}
+                    <div class="carousel-caption d-none d-md-block">
+                        {{ carousel[2].header | raw }}
+                        {{ carousel[2].paragraph | raw }}
+                    </div>
+            </div>
+        </div>
+        <!-- Inner -->
+
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-mdb-target="#carouselBasicExample"
+                data-mdb-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-mdb-target="#carouselBasicExample"
+                data-mdb-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    <!-- Carousel wrapper -->
+{% endblock %}

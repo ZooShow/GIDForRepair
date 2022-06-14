@@ -26,6 +26,8 @@
                 type="text/javascript"
                 src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/4.1.0/mdb.min.js"
         ></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
         {{ encore_entry_script_tags('app') }}
     {% endblock %}
 </head>
@@ -68,13 +70,13 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <li>
-                            <a class="dropdown-item" href="#">Косметический ремонт</a>
+                            <a class="dropdown-item" href="/article/1">Косметический ремонт</a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">Капитальный ремонт</a>
+                            <a class="dropdown-item" href="/article/2">Капитальный ремонт</a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">Евроремонт</a>
+                            <a class="dropdown-item" href="/article/3">Евроремонт</a>
                         </li>
                     </ul>
                 </li>
@@ -93,10 +95,10 @@
                         <li>
                             <a class="dropdown-item" href="#">Классический калькулятор</a>
                         </li>
-                        <li>
-                            <a class="dropdown-item" href={{ path('calculator_render_graphic') }}>Графический
-                                калькулятор</a>
-                        </li>
+{#                        <li>#}
+{#                            <a class="dropdown-item" href={{ path('calculator_render_graphic') }}>Графический#}
+{#                                калькулятор</a>#}
+{#                        </li>#}
                     </ul>
             </ul>
             <!-- Left links -->

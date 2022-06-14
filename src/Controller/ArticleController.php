@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
+use App\Repository\RepairKindRepository;
+use App\Repository\RepairTypeRepository;
 use App\Repository\UserRepository;
 use App\Service\ArticleService;
 use App\Service\ResponseService;
@@ -27,16 +29,24 @@ class ArticleController extends AbstractController
 
     private ArticleService $articleService;
 
+    private RepairKindRepository $repairKindRepository;
+
+    private RepairTypeRepository $repairTypeRepository;
+
     public function __construct(
         ResponseService $responseService,
         ArticleRepository $articleRepository,
         UserRepository $userRepository,
-        ArticleService $articleService
+        ArticleService $articleService,
+        RepairKindRepository $repairKindRepository,
+        RepairTypeRepository $repairTypeRepository
     ) {
         $this->responseService = $responseService;
         $this->articleRepository = $articleRepository;
         $this->userRepository = $userRepository;
         $this->articleService = $articleService;
+        $this->repairKindRepository = $repairKindRepository;
+        $this->repairTypeRepository = $repairTypeRepository;
     }
 
     /**
@@ -45,7 +55,8 @@ class ArticleController extends AbstractController
     public function createArticle(): Response
     {
         return $this->render('article/create.html.twig', [
-            'controller_name' => 'Article',
+            'materials' => $this->articleService->getMaterials(),
+            'tools' => $this->articleService->getTools()
         ]);
     }
 
@@ -61,25 +72,19 @@ class ArticleController extends AbstractController
 
             $data = $request->getContent();
             $dataSerialize = json_decode($data);
-            $tmp = $this->articleService->parseArticle($dataSerialize);
 
-            $user = $this->userRepository->findOneBy(['email' => $userRequest->getUserIdentifier()]);
-
-            $article = new Article();
-            $article->setText($tmp);
-            $article->setAuthor($user);
-            $this->articleRepository->save($article);
+            $this->articleService->saveArticle($dataSerialize, $userRequest);
 
             $data = [
                 "success" => true,
-                "errors" => "При сохранении статьи что-то пошло не так"
+                "errors" => "Статья успешно сохранена!"
             ];
 
             return $this->responseService->response($data);
         } catch (Exception $e) {
             $data = [
                 "success" => false,
-                "errors" => "При сохранении статьи что-то пошло не так"
+                "errors" => "При сохранении статьи что-то пошло не так!"
             ];
 
             return $this->responseService->response($data, Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -87,8 +92,6 @@ class ArticleController extends AbstractController
     }
 
     /**
-     * @param Request $request
-     * @return void
      *
      * @Route("/upload_file", name="save_file")
      */
@@ -116,16 +119,73 @@ class ArticleController extends AbstractController
     }
 
     /**
+     * @param Request $request
+     * @return void
+     *
+     * @Route("/upload_url", name="save_url")
+     */
+    public function uploadImageFromUrl(Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent());
+            $content = file_get_contents($data->url);
+            $fileDirectory = $this->getParameter('kernel.project_dir') . '/public/uploads/';
+            $fileName = md5(uniqid('', true)) . ".jpg";
+            $fp = fopen($fileDirectory . $fileName, "w");
+            fwrite($fp, $content);
+            fclose($fp);
+//            $content->move($fileDirectory, $fileName);
+            $data = [
+                "success" => 1,
+                "file" => [
+                    "url" => 'http://127.0.0.1:8000/uploads/' . $fileName
+                ]
+            ];
+            return $this->responseService->response($data);
+        } catch (Exception $e) {
+            $data = [
+                "success" => 0,
+                "errors" => "Data no valid"
+            ];
+            return $this->responseService->response($data, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    /**
      * @param $id
      * @return void
      *
-     * @Route ("/{id}", name="show")
+     * @Route ("/show/{id}", name="show")
      */
     public function showArticle($id): Response
     {
-        $article = $this->articleRepository->find($id);
+        $article = $this->articleService->getArticleById($id);
         return $this->render('article/view.html.twig', [
-            'text' => $article->getText()
+            'article' => $article,
+        ]);
+    }
+
+    /**
+     * @Route ("/{id}", name="show_list")
+     */
+    public function showListArticleByCategory($id): Response
+    {
+        $articles = $this->articleService->getArticlesByType($id);
+
+        return $this->render('article/list.html.twig', [
+           'articles' => $articles
+        ]);
+    }
+
+    /**
+     * @Route ("/main/page", name="show_main_page")
+     */
+    public function showMainPage(): Response
+    {
+        $carouselView = $this->articleService->getCarouselView();
+
+        return $this->render('index.html.twig',[
+            'carousel' => $carouselView
         ]);
     }
 }

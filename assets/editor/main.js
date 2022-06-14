@@ -10,10 +10,13 @@ import Table from "@editorjs/table";
 import SimpleVideo from 'simple-video-editorjs';
 
 (() => {
-    let a = document.getElementById('btnSaves');
-    if (a === null) {
+    let btnSave = document.getElementById('btnSaves');
+    let btnClear = document.getElementById('btnReset');
+
+    if (btnSave === null) {
         return;
     }
+
     const editor = new EditorJS({
         holderId: "editorJS",
         tools: {
@@ -23,7 +26,7 @@ import SimpleVideo from 'simple-video-editorjs';
                 config: {
                     endpoints: {
                         byFile: 'http://127.0.0.1:8000/article/upload_file', // Your backend file uploader endpoint
-                        byUrl: 'http://127.0.0.1:8008/fetchUrl', // Your endpoint that provides uploading by Url
+                        byUrl: 'http://127.0.0.1:8000/article/upload_url', // Your endpoint that provides uploading by Url
                     }
                 }
             },
@@ -137,26 +140,65 @@ import SimpleVideo from 'simple-video-editorjs';
             }
         },
     });
-    const edjsHTML = require('editorjs-html');
-    const edjsParser = edjsHTML();
-    a.onclick = function () {
-        editor.save().then((outputData) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "/article/save", true);
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.onload = () => {
-                if (xhr.status == 200) {
-                    console.log(xhr.responseText);
-                } else {
-                    console.log("Server response: ", xhr.statusText);
-                }
-            };
 
-            console.log(outputData);
-            console.log(JSON.stringify(outputData))
-            xhr.send(JSON.stringify(outputData))
+    btnSave.onclick = function () {
+        editor.save().then((outputData) => {
+            let repairKind = document.getElementById('repairKind');
+            let repairType = document.getElementById('repairType');
+
+            if (outputData.blocks.length === 0) {
+                alert('Похоже вы ничего не написали!');
+            } else {
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/article/save", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.onload = () => {
+                    if (xhr.status == 200) {
+                        alert(JSON.parse(xhr.responseText).errors);
+                    } else {
+                        alert(JSON.parse(xhr.statusText).errors)
+                    }
+                }
+                let materials = document.querySelectorAll('.material')
+                console.log(materials);
+                if (materials.length < 1) {
+                    alert('Для ремонта необходим хотя бы один материал!');
+                }
+                let materialsMas = [];
+                materials.forEach(material => {
+                    materialsMas.push({
+                        value: material.value,
+                        name: material.dataset.materialName
+                    })
+                })
+                console.log(materialsMas);
+                let tools = document.querySelectorAll('.tool');
+                console.log(tools);
+                if (tools.length < 1) {
+                    alert('Для ремонта необходим хотя бы один инструмент!');
+                    return;
+                }
+                let toolsMas = [];
+                tools.forEach(tool => {
+                    toolsMas.push(tool.innerHTML);
+                })
+                console.log(toolsMas)
+                xhr.send(JSON.stringify({
+                            article: outputData,
+                            tools: toolsMas,
+                            materials: materialsMas,
+                            repairKind: repairKind.value,
+                            repairType: repairType.value
+                        }
+                    )
+                )
+            }
         }).catch((error) => {
             console.log('Saving failed: ', error)
         });
     };
+
+    btnClear.onclick = function () {
+        editor.blocks.clear();
+    }
 })();

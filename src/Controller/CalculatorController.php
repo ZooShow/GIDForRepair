@@ -28,27 +28,25 @@ class CalculatorController extends AbstractController
 
 
     /**
-     * @Route("/graphic", name="render_graphic")
+     * @Route("/{id}", name="render_graphic")
      */
-    public function graphicCalculator(): Response
+    public function graphicCalculator(int $id): Response
     {
         return $this->render('calculator/graph_calculator.html.twig', [
-            'controller_name' => 'CalculatorController',
+            'id' => $id
         ]);
     }
 
     /**
-     * @Route ("/calculate", name = "calculate_graphic")
+     * @Route ("/calculate/{id}", name = "calculate_graphic")
      */
-    public function calculate(Request $request): Response
+    public function calculate(Request $request, int $id): Response
     {
         $data = $request->getContent();
         $dataSerialize = json_decode($data);
-        $answer = $this->calculatorService->calculateArea($dataSerialize->data);
-        $data = [
-            'data' => $answer,
-            'message' => 'success'
-        ];
+        $area = $this->calculatorService->calculateArea($dataSerialize->data);
+        $perim = $this->calculatorService->calulatePerim($dataSerialize->data);
+        $data = $this->calculatorService->calculateToolAndMaterial($id, $perim, $area);
         return $this->responseService->response($data);
     }
 }
