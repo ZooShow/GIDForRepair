@@ -1,12 +1,16 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <div id="dataId" data-id="{{ article.id }}"></div>
     <div class="shadow-2-strong"
-         style="width: 70vw; margin-top: 20px; margin-left: 15vw; padding-top:20px; padding-left: 20px; padding-right: 20px">
+         style="width: 70vw; margin-top: 20px; margin-left: 15vw; padding: 20px 20px 50px;">
         <span>Автор: {{ article.author }}</span>
 
         {{ article.article|raw }}
-        <p>Не знаете какие средства необходимы для ремонта? Наш умный <a href="/calculator/{{ article.id }}" target="_blank">калькулятор</a> вам поможет!</p>
+        <p>Не знаете какие средства необходимы для ремонта? Наш умный <a href="/calculator/{{ article.id }}"
+                                                                         target="_blank">калькулятор</a> вам поможет!
+        </p>
+
         <h3>Необходимые инструменты</h3>
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for tool in article.tools %}
@@ -46,6 +50,32 @@
                                 у
                                 поставщиков</a>
                         </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h2>Комментарии:</h2>
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                <div class="form-outline border rounded-8">
+                    <textarea class="form-control" id="textAreaComment" rows="2"></textarea>
+                    <label class="form-label" for="textAreaComment">Оставьте комментарий!</label>
+                </div>
+                <input id="sendComment" class="btn btn-light btn-rounded" type="button" value="Отправить">
+            {% else %}
+                <span>Комментарии доступны только авторизованным пользователям! <a
+                            href="/login">Авторизоваться.</a></span>
+            {% endif %}
+        </div>
+
+        <div style="margin-top: 20px; margin-bottom: 50px">
+            {% for comment in article.comments %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ comment.author.name }} {{ comment.author.secondName }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ comment.date|date('d.m.Y h:m') }}</h6>
+                        <p class="card-text">{{ comment.text }}</p>
                     </div>
                 </div>
             {% endfor %}

@@ -57,9 +57,9 @@ class ArticleService
         $this->em = $em;
     }
 
-    public function getCarouselView(): array
+    public function getCarouselView(int $id): array
     {
-        $articles = $this->articleRepository->findBy([], ['id'], 3);
+        $articles = $this->articleRepository->findBy(['repairKind' => $id], null, 3);
         $tmp = [];
         foreach ($articles as $article) {
             $text = $article->getText();
@@ -352,10 +352,12 @@ class ArticleService
 
         return [
             'id' => $article->getId(),
+            'repairKindId' => $article->getRepairKind()->getId(),
             'article' => $article->getText(),
             'author' => $article->getAuthor()->getName() . ' ' . $article->getAuthor()->getSecondName(),
             'tools' => $tools,
-            'materials' => $materials
+            'materials' => $materials,
+            'comments' => $article->getComments()
         ];
     }
 }

@@ -160,8 +160,10 @@ class ArticleController extends AbstractController
     public function showArticle($id): Response
     {
         $article = $this->articleService->getArticleById($id);
+        $carouselView = $this->articleService->getCarouselView($article['repairKindId']);
         return $this->render('article/view.html.twig', [
             'article' => $article,
+            'carousel' => $carouselView
         ]);
     }
 
