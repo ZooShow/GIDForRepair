@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Article;
 use App\Repository\ArticleRepository;
 use App\Repository\RepairKindRepository;
 use App\Repository\RepairTypeRepository;
@@ -10,6 +9,8 @@ use App\Repository\UserRepository;
 use App\Service\ArticleService;
 use App\Service\ResponseService;
 use Exception;
+use FOS\ElasticaBundle\Finder\PaginatedFinderInterface;
+use FOS\ElasticaBundle\Finder\TransformedFinder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,13 +34,16 @@ class ArticleController extends AbstractController
 
     private RepairTypeRepository $repairTypeRepository;
 
+    private TransformedFinder $finder;
+
     public function __construct(
         ResponseService $responseService,
         ArticleRepository $articleRepository,
         UserRepository $userRepository,
         ArticleService $articleService,
         RepairKindRepository $repairKindRepository,
-        RepairTypeRepository $repairTypeRepository
+        RepairTypeRepository $repairTypeRepository,
+        TransformedFinder $finder
     ) {
         $this->responseService = $responseService;
         $this->articleRepository = $articleRepository;
@@ -47,6 +51,7 @@ class ArticleController extends AbstractController
         $this->articleService = $articleService;
         $this->repairKindRepository = $repairKindRepository;
         $this->repairTypeRepository = $repairTypeRepository;
+        $this->finder = $finder;
     }
 
     /**
@@ -167,8 +172,23 @@ class ArticleController extends AbstractController
         ]);
     }
 
+
     /**
-     * @Route ("/{id}", name="show_list")
+     * @Route ("/search", name="search")
+     */
+    public function search(Request $request): Response
+    {
+        $data = $request->query->get('data');
+        $results2 = $this->finder->findHybrid($data);
+        $a = 10;
+        $articles = $this->articleService->getArticleSearch($results2);
+        return $this->render('article/list.html.twig', [
+            'articles' => $articles
+        ]);
+    }
+
+    /**
+     * @Route ("/category/{id}", name="show_list")
      */
     public function showListArticleByCategory($id): Response
     {

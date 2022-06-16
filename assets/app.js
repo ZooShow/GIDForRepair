@@ -6,3 +6,4 @@ import './editor/main';
 import './comment/main';
 import './editor/listInsert';
 import './calculator/main';
+import './finder/main';

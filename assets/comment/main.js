@@ -6,7 +6,6 @@
     let id = JSON.parse(document.getElementById('dataId').dataset.id);
     btnSendComment.onclick = function () {
         textareaValue = document.getElementById('textAreaComment').value;
-        console.log(textareaValue)
         if (!textareaValue || /^\s*$/.test(textareaValue) || textareaValue.length === 0) {
             alert('Вы ввели неподходящий комментарий!');
             return

@@ -119,6 +119,26 @@ class ArticleService
         return $str;
     }
 
+    public function getArticleSearch(array $articlesFos): array
+    {
+        $tmp = [];
+        foreach ($articlesFos as $item) {
+            $articleFos = $item->getTransformed();
+            $article = $this->articleRepository->find($articleFos->getId());
+            $text = $article->getText();
+            $tmp[] = [
+                'header' => '<h3>'. $article->getRepairType()->getName() . '</h3>',
+                'paragraph' => $this->getParagraph($articleFos->getText()),
+                'img' => $this->getImg($text),
+                'id' => $article->getId()
+            ];
+        }
+        return [
+            'title' => 'Результаты поиска',
+            'articles' => $tmp
+        ];
+    }
+
     public function getArticlesByType(int $id): array
     {
         $repairKind = $this->repairKindRepository->find($id);
@@ -155,7 +175,7 @@ class ArticleService
     {
         $pos1 = strpos($text, '<p');
         $pos2 = strpos($text, '</p');
-        if ($pos1 && $pos2) {
+        if ($pos1 !== false && $pos2) {
             return substr($text, $pos1, $pos2-$pos1 + 4);
         }
         return null;
