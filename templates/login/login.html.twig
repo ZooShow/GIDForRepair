@@ -4,7 +4,9 @@
 
 {% block body %}
     {% if error %}
-        Не верный логин или пароль!
+        <script>
+            alert('Не верный логин или пароль!');
+        </script>
     {% endif %}
     <div class="d-flex align-items-center justify-content-center" style="margin-top: 80px">
         <a class="navbar-brand mt-2 mt-lg-0" href="#">

@@ -34,7 +34,7 @@ import PenTool from 'pen-tool'
                     let answer = document.querySelector('.answer');
                     answer.classList.remove('hidden');
                     let data = JSON.parse(xhr.responseText);
-                    answer.innerHTML = 'Площадь: ' + data.area + 'м², периметр:' + data.perimeter + 'м';
+                    answer.innerHTML = 'Площадь: ' + data.area + 'м², периметр: ' + data.perimeter + 'м';
 
                     data.tools.forEach(tool => {
                         let toolDiv = document.createElement('div');
@@ -80,7 +80,7 @@ import PenTool from 'pen-tool'
                     })
 
                     let itog_material = document.createElement('h3');
-                    itog_material.innerHTML = 'Итого за инструменты: минимум - ' + data.material_price.min + 'руб, максимум - ' + data.material_price.max + 'руб, в среднем - ' + data.material_price.avg + 'руб';
+                    itog_material.innerHTML = 'Итого за материалы: минимум - ' + data.material_price.min + 'руб, максимум - ' + data.material_price.max + 'руб, в среднем - ' + data.material_price.avg + 'руб';
                     body.appendChild(itog_material);
                 } else {
                     console.log("Server response: ", xhr.status);
@@ -91,7 +91,7 @@ import PenTool from 'pen-tool'
             }
             xhr.send(JSON.stringify(data))
         } else {
-            console.log('is not close state');
+            alert('Линия должна быть замкнутой');
         }
     });
 

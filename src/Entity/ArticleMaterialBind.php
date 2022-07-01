@@ -61,12 +61,12 @@ class ArticleMaterialBind
         return $this;
     }
 
-    public function getCount(): ?int
+    public function getCount(): ?float
     {
         return $this->count;
     }
 
-    public function setCount(int $count): self
+    public function setCount(float $count): self
     {
         $this->count = $count;
 

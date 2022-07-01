@@ -24,33 +24,21 @@ class ArticleController extends AbstractController
 {
     private ResponseService $responseService;
 
-    private ArticleRepository $articleRepository;
-
     private UserRepository $userRepository;
 
     private ArticleService $articleService;
-
-    private RepairKindRepository $repairKindRepository;
-
-    private RepairTypeRepository $repairTypeRepository;
 
     private TransformedFinder $finder;
 
     public function __construct(
         ResponseService $responseService,
-        ArticleRepository $articleRepository,
         UserRepository $userRepository,
         ArticleService $articleService,
-        RepairKindRepository $repairKindRepository,
-        RepairTypeRepository $repairTypeRepository,
         TransformedFinder $finder
     ) {
         $this->responseService = $responseService;
-        $this->articleRepository = $articleRepository;
         $this->userRepository = $userRepository;
         $this->articleService = $articleService;
-        $this->repairKindRepository = $repairKindRepository;
-        $this->repairTypeRepository = $repairTypeRepository;
         $this->finder = $finder;
     }
 
@@ -61,14 +49,16 @@ class ArticleController extends AbstractController
     {
         return $this->render('article/create.html.twig', [
             'materials' => $this->articleService->getMaterials(),
-            'tools' => $this->articleService->getTools()
+            'tools' => $this->articleService->getTools(),
+            'title' => 'Создание статьи',
+            'is_edit' => false
         ]);
     }
 
     /**
      * @param Request $request
      * @return void
-     * @Route("/save", name="save")
+     * @Route("/save_article", name="save_article")
      */
     public function saveArticle(Request $request): JsonResponse
     {
@@ -83,6 +73,35 @@ class ArticleController extends AbstractController
             $data = [
                 "success" => true,
                 "errors" => "Статья успешно сохранена!"
+            ];
+
+            return $this->responseService->response($data);
+        } catch (Exception $e) {
+            $data = [
+                "success" => false,
+                "errors" => "При сохранении статьи что-то пошло не так!"
+            ];
+
+            return $this->responseService->response($data, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return void
+     * @Route("/save_edit", name="save")
+     */
+    public function saveEditArticle(Request $request): JsonResponse
+    {
+        try {
+            $data = $request->getContent();
+            $dataSerialize = json_decode($data);
+
+            $this->articleService->editArticle($dataSerialize);
+
+            $data = [
+                "success" => true,
+                "errors" => "Статья успешно изменена!"
             ];
 
             return $this->responseService->response($data);
@@ -165,10 +184,10 @@ class ArticleController extends AbstractController
     public function showArticle($id): Response
     {
         $article = $this->articleService->getArticleById($id);
-        $carouselView = $this->articleService->getCarouselView($article['repairKindId']);
+        $carouselView = $this->articleService->getCarouselView($article['repairKindId'], $id);
         return $this->render('article/view.html.twig', [
             'article' => $article,
-            'carousel' => $carouselView
+            'carousels' => $carouselView
         ]);
     }
 
@@ -180,10 +199,10 @@ class ArticleController extends AbstractController
     {
         $data = $request->query->get('data');
         $results2 = $this->finder->findHybrid($data);
-        $a = 10;
         $articles = $this->articleService->getArticleSearch($results2);
         return $this->render('article/list.html.twig', [
-            'articles' => $articles
+            'articles' => $articles,
+            'is_edit' => false
         ]);
     }
 
@@ -195,19 +214,36 @@ class ArticleController extends AbstractController
         $articles = $this->articleService->getArticlesByType($id);
 
         return $this->render('article/list.html.twig', [
-           'articles' => $articles
+           'articles' => $articles,
+            'is_edit' => false
         ]);
     }
 
     /**
-     * @Route ("/main/page", name="show_main_page")
+     * @Route ("/edit", name = "edit")
      */
-    public function showMainPage(): Response
+    public function getArticlesByUser(): Response
     {
-        $carouselView = $this->articleService->getCarouselView();
+        $user = $this->getUser();
+        $userEntity = $this->userRepository->findOneBy(['email' => $user->getUserIdentifier()]);
+        $articles = $this->articleService->getArticlesByUser($userEntity);
+        return $this->render('article/list.html.twig', [
+            'articles' => $articles,
+            'is_edit' => true
+        ]);
+    }
 
-        return $this->render('index.html.twig',[
-            'carousel' => $carouselView
+    /**
+     * @Route ("/edit/{id}", name = "edit_id")
+     */
+    public function editArticle(int $id): Response
+    {
+        $article = $this->articleService->prepareArticleBeforeEdit($id);
+        return $this->render('article/edit.html.twig', [
+            'title' => 'Редактирование статьи',
+            'materials' => $this->articleService->getMaterials(),
+            'tools' => $this->articleService->getTools(),
+            'article' => $article,
         ]);
     }
 }

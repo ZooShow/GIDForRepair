@@ -47,7 +47,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <a class="navbar-brand mt-2 mt-lg-0" href="#">
+            <a class="navbar-brand mt-2 mt-lg-0" href="/">
                 <img
                         src="http://127.0.0.1:8000/resources/logo.png"
                         height="30"
@@ -84,15 +84,14 @@
             <!-- Left links -->
         </div>
         <div class="input-group rounded" style="width: 250px; margin-right: 100px">
-            <input id="searchInput" type="search" class="form-control rounded" placeholder="Найти статью" aria-label="Search"
+            <input id="searchInput" type="search" class="form-control rounded" placeholder="Найти статью"
+                   aria-label="Search"
                    aria-describedby="search-addon"/>
             <button id="btnSearch" type="button" class="btn btn-primary">
                 <i class="fas fa-search"></i>
             </button>
         </div>
-        <!-- Collapsible wrapper -->
         {% if is_granted('ROLE_PROFESSIONAL') %}
-            proffessional
             <div class="dropdown">
                 <a
                         class="dropdown-toggle d-flex align-items-center hidden-arrow"
@@ -115,10 +114,10 @@
                         aria-labelledby="navbarDropdownMenuAvatar"
                 >
                     <li>
-                        <a class="dropdown-item" href="#">Профиль</a>
+                        <a class="dropdown-item" href="{{ path('article_create') }}">Написать статью</a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="{{ path('article_create') }}">Написать статью</a>
+                        <a class="dropdown-item" href="{{ path('article_edit') }}">Мои статьи</a>
                     </li>
                     <li>
                         <a class="dropdown-item" href="/logout">Выйти</a>
@@ -126,7 +125,6 @@
                 </ul>
             </div>
         {% elseif is_granted('ROLE_USER') %}
-            user
             <div class="dropdown">
                 <a
                         class="dropdown-toggle d-flex align-items-center hidden-arrow"
@@ -148,12 +146,6 @@
                         class="dropdown-menu dropdown-menu-end"
                         aria-labelledby="navbarDropdownMenuAvatar"
                 >
-                    <li>
-                        <a class="dropdown-item" href="#">My profile</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">Settings</a>
-                    </li>
                     <li>
                         <a class="dropdown-item" href="/logout">Выйти</a>
                     </li>
@@ -188,6 +180,35 @@
     </div>
     </div>
 </nav>
+
+<div
+    class="modal fade"
+    id="staticBackdrop"
+    data-mdb-backdrop="static"
+    data-mdb-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="staticBackdropLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Обратная связь</h5>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-outline border rounded-8">
+                    <textarea class="form-control" id="textArea" rows="10"></textarea>
+                    <label class="form-label" for="textArea">Опишите свою проблему</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light btn-rounded" data-mdb-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-light btn-rounded" data-mdb-dismiss="modal">Отправить</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% block body %}{% endblock %}
 </body>
 </html>

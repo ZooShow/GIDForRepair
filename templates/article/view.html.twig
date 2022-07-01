@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ article.title }}{% endblock %}
+
 {% block body %}
     <div id="dataId" data-id="{{ article.id }}"></div>
     <div class="shadow-2-strong"
@@ -7,7 +9,7 @@
         <span>Автор: {{ article.author }}</span>
 
         {{ article.article|raw }}
-        <p>Не знаете какие средства необходимы для ремонта? Наш умный <a href="/calculator/{{ article.id }}"
+        <p class="text-info">Не знаете какие средства необходимы для ремонта? Наш умный <a href="/calculator/{{ article.id }}"
                                                                          target="_blank">калькулятор</a> вам поможет!
         </p>
 
@@ -55,6 +57,31 @@
             {% endfor %}
         </div>
 
+        {% if carousels|length > 0 %}
+        <h3 style="margin-top: 10px">Вам может понравиться</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for carousel in carousels %}
+                <div class="col">
+                    <div class="card h-100">
+                        {% if carousel.img is not null  %}
+                            <img src="{{ carousel.img|raw }}" class="card-img-top" alt="Skyscrapers"/>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{ carousel.header|raw }}</h5>
+                            <p class="card-text">
+                                {{ carousel.paragraph|raw }}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/article/show/{{ carousel.id }}" class="btn btn-primary" target="_blank">Посмотреть</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         <div style="margin-top: 20px;">
             <h2>Комментарии:</h2>
             {% if is_granted('IS_AUTHENTICATED_FULLY') %}
@@ -74,7 +101,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">{{ comment.author.name }} {{ comment.author.secondName }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ comment.date|date('d.m.Y h:m') }}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ comment.date|date('d.m.Y') }}</h6>
                         <p class="card-text">{{ comment.text }}</p>
                     </div>
                 </div>

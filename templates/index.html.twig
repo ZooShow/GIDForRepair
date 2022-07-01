@@ -3,76 +3,44 @@
 {% block title %}Гид по ремонту{% endblock %}
 
 {% block body %}
-    <!-- Carousel wrapper -->
-    <div id="carouselBasicExample" class="carousel slide carousel-fade" data-mdb-ride="carousel">
-        <!-- Indicators -->
-        <div class="carousel-indicators">
-            <button
-                    type="button"
-                    data-mdb-target="#carouselBasicExample"
-                    data-mdb-slide-to="0"
-                    class="active"
-                    aria-current="true"
-                    aria-label="Slide 1"
-            ></button>
-            <button
-                    type="button"
-                    data-mdb-target="#carouselBasicExample"
-                    data-mdb-slide-to="1"
-                    aria-label="Slide 2"
-            ></button>
-            <button
-                    type="button"
-                    data-mdb-target="#carouselBasicExample"
-                    data-mdb-slide-to="2"
-                    aria-label="Slide 3"
-            ></button>
-        </div>
-
-        <!-- Inner -->
-        <div class="carousel-inner">
-            <!-- Single item -->
-            <div class="carousel-item active">
-                {{ carousel[0].img | raw }}
-                <div class="carousel-caption d-none d-md-block">
-                    {{ carousel[0].header | raw }}
-                    {{ carousel[0].paragraph | raw }}
-                </div>
-            </div>
-
-            <!-- Single item -->
-            <div class="carousel-item">
-                <div class="carousel-item active">
-                    {{ carousel[1].img | raw }}
-                    <div class="carousel-caption d-none d-md-block">
-                        {{ carousel[1].header | raw }}
-                        {{ carousel[1].paragraph | raw }}
-                    </div>
-            </div>
-
-            <!-- Single item -->
-            <div class="carousel-item">
-                <div class="carousel-item active">
-                    {{ carousel[2].img | raw }}
-                    <div class="carousel-caption d-none d-md-block">
-                        {{ carousel[2].header | raw }}
-                        {{ carousel[2].paragraph | raw }}
-                    </div>
-            </div>
-        </div>
-        <!-- Inner -->
-
-        <!-- Controls -->
-        <button class="carousel-control-prev" type="button" data-mdb-target="#carouselBasicExample"
-                data-mdb-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-mdb-target="#carouselBasicExample"
-                data-mdb-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+    <div class="d-flex align-items-center justify-content-center" style="margin-top: 80px">
+        <a class="navbar-brand mt-2 mt-lg-0" href="#">
+            <img
+                    src="http://127.0.0.1:8000/resources/logo.png"
+                    height="70"
+                    alt="MDB Logo"
+                    loading="lazy"
+            />
+        </a>
     </div>
-    <!-- Carousel wrapper -->
+
+    <div class="d-flex align-items-center justify-content-center" style="margin-top: 20px; margin-bottom: 30px">
+        <h1>Гид по ремонту</h1>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center" style="margin-top: 20px; margin-bottom: 30px">
+        <h3>Здесь вы можете найти всю необходимую информацию о ремонте</h3>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center" style="margin-top: 20px; margin-bottom: 30px">
+        <div class="input-group rounded" style="width: 500px;">
+            <input id="searchInputMain" type="search" class="form-control rounded" placeholder="Найти статью"
+                   aria-label="Search"
+                   aria-describedby="search-addon"/>
+            <button id="btnSearchMain" type="button" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="text-center text-white" style="background-color: white;">
+        <div class="container p-4 pb-0">
+            <p style="color: black">Вы можете посмотреть список статей по категориям:</p>
+            <span>
+                <a class="dropdown-item" href="/article/category/1">Косметический ремонт</a>
+                <a class="dropdown-item" href="/article/category/2">Капитальный ремонт</a>
+                <a class="dropdown-item" href="/article/category/3">Евроремонт</a>
+            </span>
+        </div>
+    </div>
 {% endblock %}

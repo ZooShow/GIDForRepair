@@ -10,12 +10,17 @@ import Table from "@editorjs/table";
 import SimpleVideo from 'simple-video-editorjs';
 
 (() => {
-    let btnSave = document.getElementById('btnSaves');
+    let btnEdit = document.getElementById('btnEdit');
     let btnClear = document.getElementById('btnReset');
 
-    if (btnSave === null) {
+    if (btnEdit === null) {
         return;
     }
+
+    let blocks = document.querySelector('.blocks');
+
+    let blocksArray = JSON.parse(blocks.dataset.blocks);
+    let id = blocksArray.id;
 
     let editor = new EditorJS({
         holderId: "editorJS",
@@ -40,6 +45,9 @@ import SimpleVideo from 'simple-video-editorjs';
                 inlineToolbar: true,
             },
             table: Table,
+        },
+        data: {
+            blocks: JSON.parse(blocksArray.text)
         },
         i18n: {
             /**
@@ -140,7 +148,7 @@ import SimpleVideo from 'simple-video-editorjs';
             }
         },
     });
-    btnSave.onclick = function () {
+    btnEdit.onclick = function () {
         editor.save().then((outputData) => {
             let repairKind = document.getElementById('repairKind');
             let repairType = document.getElementById('repairType');
@@ -149,7 +157,7 @@ import SimpleVideo from 'simple-video-editorjs';
                 alert('Похоже вы ничего не написали!');
             } else {
                 const xhr = new XMLHttpRequest();
-                xhr.open("POST", "/article/save_article", true);
+                xhr.open("POST", "/article/save_edit", true);
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.onload = () => {
                     if (xhr.status == 200) {
@@ -161,7 +169,6 @@ import SimpleVideo from 'simple-video-editorjs';
                 let materials = document.querySelectorAll('.material')
                 if (materials.length < 1) {
                     alert('Для ремонта необходим хотя бы один материал!');
-                    return;
                 }
                 let materialsMas = [];
                 materials.forEach(material => {
@@ -170,7 +177,6 @@ import SimpleVideo from 'simple-video-editorjs';
                         name: material.dataset.materialName
                     })
                 })
-                console.log(materialsMas);
                 let tools = document.querySelectorAll('.tool');
                 console.log(tools);
                 if (tools.length < 1) {
@@ -182,6 +188,7 @@ import SimpleVideo from 'simple-video-editorjs';
                     toolsMas.push(tool.innerHTML);
                 })
                 xhr.send(JSON.stringify({
+                            id: id,
                             article: outputData,
                             tools: toolsMas,
                             materials: materialsMas,

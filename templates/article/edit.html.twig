@@ -5,9 +5,7 @@
 {% block body %}
     <div class="materialsArray" data-materials-array="{{ materials|json_encode|e('html_attr') }}"></div>
     <div class="toolsArray" data-tools-array="{{ tools|json_encode|e('html_attr') }}"></div>
-    {% if is_edit %}
-        <div class="blocks" data-blocks="{{ article|json_encode|e('html_attr') }}"></div>
-    {% endif %}
+    <div class="blocks" data-blocks="{{ article|json_encode|e('html_attr') }}"></div>
     <div id="app" class="container mt-5 shadow-5-strong ">
         <div class="card-header">Поделись с другими пользователями своими знаниями и умениями!</div>
         <div class="card-body over-hidden">
@@ -54,7 +52,7 @@
         </div>
 
         <div class="card-footer text-right">
-            <button id="btnSaves" class="btn btn-light btn-rounded">
+            <button id="btnEdit" class="btn btn-light btn-rounded">
                 Сохранить
             </button>
             <button id="btnReset" class="btn btn-light btn-rounded">

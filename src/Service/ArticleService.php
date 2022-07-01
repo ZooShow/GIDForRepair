@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Article;
 use App\Entity\ArticleMaterialBind;
 use App\Entity\ArticleToolBind;
+use App\Entity\User;
 use App\Repository\ArticleMaterialBindRepository;
 use App\Repository\ArticleRepository;
 use App\Repository\ArticleToolBindRepository;
@@ -57,15 +58,18 @@ class ArticleService
         $this->em = $em;
     }
 
-    public function getCarouselView(int $id): array
+    public function getCarouselView(int $id, int $articleId): array
     {
         $articles = $this->articleRepository->findBy(['repairKind' => $id], null, 3);
         $tmp = [];
         foreach ($articles as $article) {
-            $text = $article->getText();
+            if ($article->getId() === $articleId) {
+                break;
+            }
+
+            $text = json_decode($article->getText());
             $tmp[] = [
-//                'header' => $this->getHeader($text),
-                'header' => '<h5>'. $article->getRepairType()->getName() . '</h5>',
+                'header' => $article->getRepairType()->getName(),
                 'paragraph' => $this->getParagraph($text),
                 'img' => $this->getImg($text),
                 'id' => $article->getId()
@@ -74,9 +78,8 @@ class ArticleService
         return $tmp;
     }
 
-    public function parseArticle(object $data): string
+    public function parseArticle(array $blocks): string
     {
-        $blocks = $data->blocks;
         $str = '';
         foreach ($blocks as $block) {
             switch ($block->type) {
@@ -125,10 +128,10 @@ class ArticleService
         foreach ($articlesFos as $item) {
             $articleFos = $item->getTransformed();
             $article = $this->articleRepository->find($articleFos->getId());
-            $text = $article->getText();
+            $text = json_decode($article->getText());
             $tmp[] = [
-                'header' => '<h3>'. $article->getRepairType()->getName() . '</h3>',
-                'paragraph' => $this->getParagraph($articleFos->getText()),
+                'header' => $article->getRepairType()->getName(),
+                'paragraph' => $this->getParagraph($text),
                 'img' => $this->getImg($text),
                 'id' => $article->getId()
             ];
@@ -142,13 +145,13 @@ class ArticleService
     public function getArticlesByType(int $id): array
     {
         $repairKind = $this->repairKindRepository->find($id);
-        $articles = $this->articleRepository->findBy(['repairKind'=>$repairKind]);
+        $articles = $this->articleRepository->findBy(['repairKind' => $repairKind]);
         $tmp = [];
         foreach ($articles as $article) {
-            $text = $article->getText();
+            $text = json_decode($article->getText());
             $articleSerialize = [
 //                'header' => $this->getHeader($text),
-                'header' => '<h3>'. $article->getRepairType()->getName() . '</h3>',
+                'header' => $article->getRepairType()->getName(),
                 'paragraph' => $this->getParagraph($text),
                 'img' => $this->getImg($text),
                 'id' => $article->getId()
@@ -161,32 +164,32 @@ class ArticleService
         ];
     }
 
-    private function getHeader(string $text): ?string
+    private function getHeader(array $text): ?string
     {
         $pos1 = strpos($text, '<h');
         $pos2 = strpos($text, '</h');
         if ($pos1 && $pos2) {
-            return substr($text, $pos1, $pos2-$pos1 + 5);
+            return substr($text, $pos1, $pos2 - $pos1 + 5);
         }
         return null;
     }
 
-    private function getParagraph(string $text): ?string
+    private function getParagraph(array $text): ?string
     {
-        $pos1 = strpos($text, '<p');
-        $pos2 = strpos($text, '</p');
-        if ($pos1 !== false && $pos2) {
-            return substr($text, $pos1, $pos2-$pos1 + 4);
+        foreach ($text as $item) {
+            if ($item->type === 'paragraph') {
+                return $item->data->text;
+            }
         }
         return null;
     }
 
-    private function getImg(string $text): ?string
+    private function getImg(array $text): ?string
     {
-        $pos1 = strpos($text, '<img');
-        $pos2 = strpos($text, 'height="430"/>');
-        if ($pos1 && $pos2) {
-            return substr($text, $pos1, $pos2-$pos1 + 14);
+        foreach ($text as $item) {
+            if ($item->type === 'image') {
+                return $item->data->file->url;
+            }
         }
         return null;
     }
@@ -304,7 +307,7 @@ class ArticleService
         $user = $this->userRepository->findOneBy(['email' => $userRequest->getUserIdentifier()]);
         $repairKind = $this->repairKindRepository->findOneBy(['name' => $data->repairKind]);
         $repairType = $this->repairTypeRepository->find((int)$data->repairType);
-        $tmp = $this->parseArticle($data->article);
+        $tmp = json_encode($data->article->blocks, JSON_UNESCAPED_UNICODE);
         $article = new Article();
         $article->setText($tmp);
         $article->setAuthor($user);
@@ -314,7 +317,7 @@ class ArticleService
         $articleId = $this->articleRepository->save($article);
 
         foreach ($data->tools as $tool) {
-            $toolEntity = $this->toolRepository->findOneBy(['name'=>$tool]);
+            $toolEntity = $this->toolRepository->findOneBy(['name' => $tool]);
             $articleToolBind = new ArticleToolBind;
             $articleToolBind->setArticleId($articleId);
             $articleToolBind->setToolId($toolEntity->getId());
@@ -326,8 +329,62 @@ class ArticleService
             $articleMaterialBind = new ArticleMaterialBind;
             $articleMaterialBind->setArticleId($articleId);
             $articleMaterialBind->setMaterialId($materialEntity->getId());
-            $articleMaterialBind->setCount($material->value);
+            $articleMaterialBind->setCount((float)$material->value);
             $this->em->persist($articleMaterialBind);
+        }
+
+        $this->em->flush();
+    }
+
+    public function editArticle(object $data)
+    {
+        $repairKind = $this->repairKindRepository->findOneBy(['name' => $data->repairKind]);
+        $repairType = $this->repairTypeRepository->find((int)$data->repairType);
+        $tmp = json_encode($data->article->blocks, JSON_UNESCAPED_UNICODE);
+        $article = $this->articleRepository->find($data->id);
+        $article->setText($tmp);
+        $article->setRepairKind($repairKind);
+        $article->setRepairType($repairType);
+
+        $articleId = $this->articleRepository->save($article);
+
+        $this->deleteArticleMaterialBind($articleId);
+        $this->deleteArticleToolBind($articleId);
+
+        foreach ($data->tools as $tool) {
+            $toolEntity = $this->toolRepository->findOneBy(['name' => $tool]);
+            $articleToolBind = new ArticleToolBind;
+            $articleToolBind->setArticleId($articleId);
+            $articleToolBind->setToolId($toolEntity->getId());
+            $this->em->persist($articleToolBind);
+        }
+
+        foreach ($data->materials as $material) {
+            $materialEntity = $this->materialRepository->findOneBy(['name' => $material->name]);
+            $articleMaterialBind = new ArticleMaterialBind;
+            $articleMaterialBind->setArticleId($articleId);
+            $articleMaterialBind->setMaterialId($materialEntity->getId());
+            $articleMaterialBind->setCount((float)$material->value);
+            $this->em->persist($articleMaterialBind);
+        }
+
+        $this->em->flush();
+    }
+
+    private function deleteArticleToolBind(int $id)
+    {
+        $articleTools = $this->articleToolBindRepository->findBy(['articleId' => $id]);
+        foreach ($articleTools as $articleTool) {
+            $this->em->remove($articleTool);
+        }
+        $this->em->flush();
+    }
+
+    private function deleteArticleMaterialBind(int $id)
+    {
+        $articleMaterials = $this->articleMaterialBindRepository->findBy(['articleId' => $id]);
+        foreach ($articleMaterials as $articleMaterials) {
+            $this->em->remove($articleMaterials);
         }
         $this->em->flush();
     }
@@ -335,7 +392,7 @@ class ArticleService
     public function getArticleById(int $id): array
     {
         $article = $this->articleRepository->find($id);
-
+        $str = $this->parseArticle(json_decode($article->getText()));
         $articleToolBind = $this->articleToolBindRepository->findBy(['articleId' => $id]);
         $tools = [];
         foreach ($articleToolBind as $item) {
@@ -373,11 +430,44 @@ class ArticleService
         return [
             'id' => $article->getId(),
             'repairKindId' => $article->getRepairKind()->getId(),
-            'article' => $article->getText(),
+            'article' => $str,
             'author' => $article->getAuthor()->getName() . ' ' . $article->getAuthor()->getSecondName(),
             'tools' => $tools,
             'materials' => $materials,
-            'comments' => $article->getComments()
+            'comments' => $article->getComments(),
+            'title' => $article->getRepairType()->getName()
+        ];
+    }
+
+    public function getArticlesByUser(User $user): array
+    {
+        $articles = $this->articleRepository->findBy(['author' => $user]);
+
+        $tmp = [];
+        foreach ($articles as $article) {
+            $text = json_decode($article->getText());
+            $articleSerialize = [
+//                'header' => $this->getHeader($text),
+                'header' =>$article->getRepairType()->getName(),
+                'paragraph' => $this->getParagraph($text),
+                'img' => $this->getImg($text),
+                'id' => $article->getId()
+            ];
+            $tmp[] = $articleSerialize;
+        }
+
+        return [
+            'title' => $articles[0]->getRepairType()->getName(),
+            'articles' => $tmp
+        ];
+    }
+
+    public function prepareArticleBeforeEdit(int $id): array
+    {
+        $article = $this->articleRepository->find($id);
+        return [
+            'text' => $article->getText(),
+            'id' => $id
         ];
     }
 }
